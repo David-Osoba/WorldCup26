@@ -9,3 +9,10 @@ data/*.db
 # Logged ticket files (optional)
 *accumulator_ticket.json
 predictions/
+
+# Secrets / Environment files
+.env
+.env.*
+!.env.example
+.env.local
+

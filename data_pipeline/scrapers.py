@@ -7,6 +7,28 @@ from bs4 import BeautifulSoup
 import json
 from data_pipeline.utils import normalize_string
 
+def load_dotenv():
+    # Load .env file manually from the project root directory to avoid extra dependencies
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env_path = os.path.join(root_dir, ".env")
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+                    if "=" in line:
+                        k, v = line.split("=", 1)
+                        k = k.strip()
+                        v = v.strip().strip("'\"")
+                        os.environ[k] = v
+        except Exception as e:
+            print(f"[WARNING] Failed to load .env file: {e}")
+
+# Load environment variables on import
+load_dotenv()
+
 class BaseScraper:
     def __init__(self, settings_path="config/settings.json"):
         with open(settings_path, "r") as f:
