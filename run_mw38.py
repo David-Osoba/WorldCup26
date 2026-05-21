@@ -1,3 +1,6 @@
+from data_pipeline.utils import load_dotenv
+load_dotenv()
+
 import os
 import sys
 import json
