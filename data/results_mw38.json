@@ -1,0 +1,72 @@
+{
+  "Brighton vs Manchester United": {
+    "home_score": 2,
+    "away_score": 2,
+    "total_corners": 11,
+    "home_actual_formation": "4-2-3-1",
+    "away_actual_formation": "3-4-2-1"
+  },
+  "Burnley vs Wolverhampton": {
+    "home_score": 1,
+    "away_score": 0,
+    "total_corners": 8,
+    "home_actual_formation": "4-4-2",
+    "away_actual_formation": "3-4-2-1"
+  },
+  "Crystal Palace vs Arsenal": {
+    "home_score": 0,
+    "away_score": 1,
+    "total_corners": 9,
+    "home_actual_formation": "3-4-2-1",
+    "away_actual_formation": "4-3-3"
+  },
+  "Fulham vs Newcastle": {
+    "home_score": 1,
+    "away_score": 3,
+    "total_corners": 11,
+    "home_actual_formation": "4-2-3-1",
+    "away_actual_formation": "4-3-3"
+  },
+  "Liverpool vs Brentford": {
+    "home_score": 3,
+    "away_score": 1,
+    "total_corners": 12,
+    "home_actual_formation": "4-3-3",
+    "away_actual_formation": "4-3-3"
+  },
+  "Manchester City vs Aston Villa": {
+    "home_score": 3,
+    "away_score": 1,
+    "total_corners": 10,
+    "home_actual_formation": "4-3-3",
+    "away_actual_formation": "4-2-3-1"
+  },
+  "Nottingham Forest vs Bournemouth": {
+    "home_score": 2,
+    "away_score": 0,
+    "total_corners": 10,
+    "home_actual_formation": "4-2-3-1",
+    "away_actual_formation": "4-2-3-1"
+  },
+  "Sunderland vs Chelsea": {
+    "home_score": 0,
+    "away_score": 2,
+    "total_corners": 9,
+    "home_actual_formation": "4-2-3-1",
+    "away_actual_formation": "4-3-3"
+  },
+  "Tottenham vs Everton": {
+    "home_score": 2,
+    "away_score": 1,
+    "total_corners": 11,
+    "home_actual_formation": "4-3-3",
+    "away_actual_formation": "4-4-2"
+  },
+  "West Ham vs Leeds": {
+    "home_score": 1,
+    "away_score": 1,
+    "total_corners": 8,
+    "home_actual_formation": "4-2-3-1",
+    "away_actual_formation": "4-2-3-1"
+  }
+}

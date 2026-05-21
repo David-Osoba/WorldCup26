@@ -1,0 +1,20 @@
+{
+  "database_path": "data/tactics_betting.db",
+  "cache_directory": "data/cache",
+  "scraping": {
+    "rate_limit_min_delay": 2.0,
+    "rate_limit_max_delay": 5.0,
+    "user_agents": [
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/120.0"
+    ]
+  },
+  "kelly_fraction": 0.25,
+  "max_bankroll_fraction_per_bet": 0.05,
+  "model_weights": {
+    "baseline_weight": 0.50,
+    "manager_form_weight": 0.20,
+    "tactical_matchup_weight": 0.30
+  }
+}
