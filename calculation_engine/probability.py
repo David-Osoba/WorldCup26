@@ -38,16 +38,29 @@ class ProbabilityEngine:
             p_base_d = implied_d / margin_sum if margin_sum > 0 else 0.0
             p_base_a = implied_a / margin_sum if margin_sum > 0 else 0.0
         else:
-            if is_neutral_venue:
-                # Symmetric baseline probabilities for neutral venues
-                p_base_h = 0.36
+            elo_ratings = self.settings.get("elo_ratings", {})
+            if elo_ratings and home_team in elo_ratings and away_team in elo_ratings:
+                elo_h = elo_ratings[home_team]
+                elo_a = elo_ratings[away_team]
+                hfa = 0.0 if is_neutral_venue else 100.0
+                r_h = 10.0 ** ((elo_h + hfa) / 400.0)
+                r_a = 10.0 ** (elo_a / 400.0)
+                p_win_h = r_h / (r_h + r_a)
+                p_win_a = r_a / (r_h + r_a)
                 p_base_d = 0.28
-                p_base_a = 0.36
+                p_base_h = (1.0 - p_base_d) * p_win_h
+                p_base_a = (1.0 - p_base_d) * p_win_a
             else:
-                # Default fallback probabilities (home field advantage factored in)
-                p_base_h = 0.42
-                p_base_d = 0.28
-                p_base_a = 0.30
+                if is_neutral_venue:
+                    # Symmetric baseline probabilities for neutral venues
+                    p_base_h = 0.36
+                    p_base_d = 0.28
+                    p_base_a = 0.36
+                else:
+                    # Default fallback probabilities (home field advantage factored in)
+                    p_base_h = 0.42
+                    p_base_d = 0.28
+                    p_base_a = 0.30
 
         # Apply motivation modifiers to baseline ratings before blending/normalization
         if motivation_modifier:
@@ -160,7 +173,10 @@ class ProbabilityEngine:
             p_base_over = de_juiced.get("over", 0.50)
             p_base_under = de_juiced.get("under", 0.50)
             
-        shots_factor = shots_sum / 27.0
+        xg_weights = self.settings.get("xg_weights", {})
+        w_goals = xg_weights.get("goals_over_under", 1.0)
+        shots_factor = 1.0 + (shots_sum / 27.0 - 1.0) * w_goals
+        shots_factor = max(0.1, shots_factor)
         
         adj_over = p_base_over * shots_factor
         adj_under = p_base_under / shots_factor
@@ -198,7 +214,10 @@ class ProbabilityEngine:
             p_base_yes = de_juiced.get("yes", 0.52)
             p_base_no = de_juiced.get("no", 0.48)
             
-        crosses_factor = crosses_sum / 23.0
+        xg_weights = self.settings.get("xg_weights", {})
+        w_btts = xg_weights.get("btts", 1.0)
+        crosses_factor = 1.0 + (crosses_sum / 23.0 - 1.0) * w_btts
+        crosses_factor = max(0.1, crosses_factor)
         
         adj_yes = p_base_yes * crosses_factor
         adj_no = p_base_no / crosses_factor
@@ -236,7 +255,10 @@ class ProbabilityEngine:
             p_base_over = de_juiced.get("over", 0.50)
             p_base_under = de_juiced.get("under", 0.50)
             
-        ppda_factor = 11.0 / ppda_avg if ppda_avg > 0 else 1.0
+        xg_weights = self.settings.get("xg_weights", {})
+        w_corners = xg_weights.get("corners", 1.0)
+        ppda_factor = 1.0 + (11.0 / ppda_avg - 1.0) * w_corners if ppda_avg > 0 else 1.0
+        ppda_factor = max(0.1, ppda_factor)
         
         adj_over = p_base_over * ppda_factor
         adj_under = p_base_under / ppda_factor

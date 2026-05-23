@@ -1,0 +1,107 @@
+{
+  "Alavés vs Rayo Vallecano": {
+    "home_score": 1,
+    "away_score": 2,
+    "total_corners": 10,
+    "home_actual_formation": "4-4-2",
+    "away_actual_formation": "4-2-3-1"
+  },
+  "Atletico Madrid vs Sevilla": {
+    "home_score": 1,
+    "away_score": 0,
+    "total_corners": 8,
+    "home_actual_formation": "5-3-2",
+    "away_actual_formation": "4-3-3"
+  },
+  "Celta Vigo vs Sevilla": {
+    "home_score": 1,
+    "away_score": 2,
+    "total_corners": 8,
+    "home_actual_formation": "4-3-3",
+    "away_actual_formation": "4-3-3"
+  },
+  "Espanyol vs Real Sociedad": {
+    "home_score": 0,
+    "away_score": 2,
+    "total_corners": 8,
+    "home_actual_formation": "4-4-2",
+    "away_actual_formation": "4-3-3"
+  },
+  "Getafe vs Osasuna": {
+    "home_score": 0,
+    "away_score": 0,
+    "total_corners": 7,
+    "home_actual_formation": "4-4-2",
+    "away_actual_formation": "4-4-2"
+  },
+  "Girona vs Elche CF": {
+    "home_score": 3,
+    "away_score": 0,
+    "total_corners": 10,
+    "home_actual_formation": "4-3-3",
+    "away_actual_formation": "4-4-2"
+  },
+  "Mallorca vs Oviedo": {
+    "home_score": 2,
+    "away_score": 0,
+    "total_corners": 9,
+    "home_actual_formation": "4-4-2",
+    "away_actual_formation": "4-4-2"
+  },
+  "Real Madrid vs Athletic Club": {
+    "home_score": 3,
+    "away_score": 1,
+    "total_corners": 11,
+    "home_actual_formation": "4-3-3",
+    "away_actual_formation": "4-2-3-1"
+  },
+  "Real Madrid vs Barcelona": {
+    "home_score": 2,
+    "away_score": 1,
+    "total_corners": 9,
+    "home_actual_formation": "4-3-3",
+    "away_actual_formation": "4-2-3-1"
+  },
+  "Real Betis vs Levante": {
+    "home_score": 4,
+    "away_score": 0,
+    "total_corners": 12,
+    "home_actual_formation": "4-3-3",
+    "away_actual_formation": "4-4-2"
+  },
+  "Real Sociedad vs Real Betis": {
+    "home_score": 1,
+    "away_score": 1,
+    "total_corners": 10,
+    "home_actual_formation": "4-3-3",
+    "away_actual_formation": "4-2-3-1"
+  },
+  "Valencia vs Barcelona": {
+    "home_score": 1,
+    "away_score": 3,
+    "total_corners": 10,
+    "home_actual_formation": "4-4-2",
+    "away_actual_formation": "4-3-3"
+  },
+  "Valencia vs Girona": {
+    "home_score": 1,
+    "away_score": 2,
+    "total_corners": 9,
+    "home_actual_formation": "4-4-2",
+    "away_actual_formation": "4-3-3"
+  },
+  "Villarreal vs Athletic Club": {
+    "home_score": 2,
+    "away_score": 2,
+    "total_corners": 11,
+    "home_actual_formation": "4-4-2",
+    "away_actual_formation": "4-2-3-1"
+  },
+  "Villarreal vs Atletico Madrid": {
+    "home_score": 1,
+    "away_score": 1,
+    "total_corners": 9,
+    "home_actual_formation": "4-4-2",
+    "away_actual_formation": "5-3-2"
+  }
+}

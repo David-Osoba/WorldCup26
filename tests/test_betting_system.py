@@ -978,5 +978,177 @@ class TestWorldCupAndTwoWayMarkets(unittest.TestCase):
             
         self.assertEqual(is_host_nation_3, "away", "Non-host vs host match where host is away must apply 'away' advantage")
 
+class TestFeedbackLoopLearning(unittest.TestCase):
+    def setUp(self):
+        self.db_path = "data/test_learning_tactics_betting.db"
+        self.settings_path = "config/test_learning_settings.json"
+        self.predictions_dir = "temp_learning_predictions"
+        
+        # Ensure clean state
+        if os.path.exists(self.predictions_dir):
+            import shutil
+            shutil.rmtree(self.predictions_dir)
+        os.makedirs(self.predictions_dir, exist_ok=True)
+        
+        with open(self.settings_path, "w") as f:
+            json.dump({
+                "database_path": self.db_path,
+                "kelly_fraction": 0.25,
+                "model_weights": {
+                    "baseline_weight": 0.5,
+                    "manager_form_weight": 0.2,
+                    "tactical_matchup_weight": 0.3
+                },
+                "elo_ratings": {
+                    "Manchester City": 1600.0,
+                    "Arsenal": 1550.0
+                },
+                "xg_weights": {
+                    "goals_over_under": 1.0,
+                    "btts": 1.0,
+                    "corners": 1.0
+                }
+            }, f)
+            
+        init_db(self.db_path)
+
+    def tearDown(self):
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
+        if os.path.exists(self.settings_path):
+            os.remove(self.settings_path)
+        if os.path.exists(self.predictions_dir):
+            import shutil
+            shutil.rmtree(self.predictions_dir)
+
+    def test_evaluate_and_adjust(self):
+        # Create a mock pre-match prediction document
+        pred_data = {
+            "match_id": "epl_20260524_mci_ars",
+            "meta": {
+                "date": "2026-05-24T15:00:00Z",
+                "competition": "Premier League",
+                "home_team": "Manchester City",
+                "away_team": "Arsenal",
+                "home_manager": "Josep Guardiola",
+                "away_manager": "Mikel Arteta"
+            },
+            "pre_match_context": {
+                "predicted_home_formation": "4-3-3",
+                "predicted_away_formation": "4-2-3-1"
+            },
+            "market_state": {
+                "bookmaker": "Pinnacle",
+                "odds_decimal": {
+                    "home_win": 2.0,
+                    "draw": 3.4,
+                    "away_win": 3.2,
+                    "goals_over_2.5": 1.8,
+                    "goals_under_2.5": 2.0,
+                    "btts_yes": 1.7,
+                    "btts_no": 2.1,
+                    "corners_over_9.5": 1.9,
+                    "corners_under_9.5": 1.9
+                }
+            },
+            "agent_inference": {
+                "model_probabilities": {
+                    "home_win": 0.50,
+                    "draw": 0.25,
+                    "away_win": 0.25,
+                    "goals_over_2.5": 0.55,
+                    "goals_under_2.5": 0.45,
+                    "btts_yes": 0.52,
+                    "btts_no": 0.48,
+                    "corners_over_9.5": 0.50,
+                    "corners_under_9.5": 0.50
+                },
+                "expected_value": {},
+                "action": {
+                    "recommended_bet": "home_win",
+                    "edge_identified": True,
+                    "kelly_fraction_pct": 2.5,
+                    "reasoning": "Value on City"
+                }
+            },
+            "post_match_resolution": {
+                "status": "pending",
+                "actual_result": None,
+                "actual_score": None,
+                "profit_loss_units": None
+            },
+            "calibration_loop": {
+                "human_override_notes": None,
+                "agent_learning_adjustment": None
+            }
+        }
+        
+        pred_path = os.path.join(self.predictions_dir, "epl_20260524_mci_ars.json")
+        with open(pred_path, "w") as f:
+            json.dump(pred_data, f, indent=2)
+            
+        # Log to DB as pending
+        log_prediction({
+            "id": "epl_20260524_mci_ars",
+            "match_date": "2026-05-24 15:00:00",
+            "home_team": "Manchester City",
+            "away_team": "Arsenal",
+            "home_manager": "Josep Guardiola",
+            "away_manager": "Mikel Arteta",
+            "home_predicted_formation": "4-3-3",
+            "away_predicted_formation": "4-2-3-1",
+            "model_p_home": 0.50,
+            "model_p_draw": 0.25,
+            "model_p_away": 0.25,
+            "placed_bet_type": "home",
+            "placed_bet_odds": 2.0,
+            "placed_bet_stake": 50.0,
+            "status": "PENDING"
+        }, self.db_path)
+        
+        # Create results file
+        results_file = os.path.join(self.predictions_dir, "results.json")
+        with open(results_file, "w") as f:
+            json.dump({
+                "Manchester City vs Arsenal": {
+                    "home_score": 3,
+                    "away_score": 1,
+                    "total_corners": 11,
+                    "home_actual_formation": "4-3-3",
+                    "away_actual_formation": "4-2-3-1"
+                }
+            }, f)
+            
+        # Execute learning
+        evaluator = ModelEvaluator(self.db_path, self.settings_path)
+        evaluator.evaluate_and_adjust_from_results([results_file], predictions_dir=self.predictions_dir, learning_rate=0.1, elo_k=32.0)
+        
+        # Reload settings
+        with open(self.settings_path, "r") as f:
+            settings = json.load(f)
+            
+        # 1. Assert ELO adjusted
+        # Old ELO: City 1600, Arsenal 1550
+        # Outcome: City wins (1.0)
+        # Pred: 0.50
+        # Delta: 32 * (1.0 - 0.50) = 16.0
+        # New ELO: City 1616.0, Arsenal 1534.0
+        self.assertEqual(settings["elo_ratings"]["Manchester City"], 1616.0)
+        self.assertEqual(settings["elo_ratings"]["Arsenal"], 1534.0)
+        
+        # 2. Assert xG weights adjusted
+        # Goals O/U 2.5: actual = 3+1 = 4 (>2.5 -> 1.0), pred = 0.55
+        # Shots sum for City and Arsenal from fbref mock stats:
+        # City: 18.2, Arsenal: 16.8 => sum = 35.0
+        # Shots factor = 35.0 / 27.0 - 1.0 = 0.2963
+        # Weight adjustment: 1.0 + 0.1 * (1.0 - 0.55) * 0.2963 = 1.0 + 0.1 * 0.45 * 0.2963 = 1.0133
+        self.assertAlmostEqual(settings["xg_weights"]["goals_over_under"], 1.0133, places=4)
+        
+        # 3. Assert DB prediction status changed to SETTLED
+        conn = sqlite3.connect(self.db_path)
+        row = conn.execute("SELECT status FROM predictions WHERE id = 'epl_20260524_mci_ars'").fetchone()
+        self.assertEqual(row[0], "SETTLED")
+        conn.close()
+
 if __name__ == "__main__":
     unittest.main()

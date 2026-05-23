@@ -65,6 +65,12 @@ def main():
     cal_parser.add_argument("--mgr", type=float, required=True, help="Weight of manager PPG form (0.0 to 1.0)")
     cal_parser.add_argument("--tactics", type=float, required=True, help="Weight of tactical formation matchups (0.0 to 1.0)")
 
+    # learn command
+    learn_parser = subparsers.add_parser("learn", help="Ingest domestic match results to adjust ELO ratings and xG weights")
+    learn_parser.add_argument("--results", nargs="+", required=True, help="Paths to JSON result files")
+    learn_parser.add_argument("--lr", type=float, default=0.05, help="Learning rate for xG weights adjustment")
+    learn_parser.add_argument("--k", type=float, default=32.0, help="ELO rating K-factor")
+
     # demo command
     subparsers.add_parser("demo", help="Run an end-to-end tactical matching and betting simulation")
 
@@ -332,6 +338,10 @@ def main():
         print(f"  Baseline Weight:        {new_weights['baseline_weight']}")
         print(f"  Manager Form Weight:    {new_weights['manager_form_weight']}")
         print(f"  Tactical Matchup Weight: {new_weights['tactical_matchup_weight']}")
+
+    elif args.command == "learn":
+        evaluator = ModelEvaluator(db_path, settings_path)
+        evaluator.evaluate_and_adjust_from_results(args.results, predictions_dir="predictions", learning_rate=args.lr, elo_k=args.k)
 
     elif args.command == "demo":
         print_banner()
